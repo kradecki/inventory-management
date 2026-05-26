@@ -104,8 +104,10 @@ export const api = {
     return response.data
   },
 
-  async getRestockingRecommendations(budget) {
-    const response = await axios.get(`${API_BASE_URL}/restocking/recommendations?budget=${budget}`)
+  async getRestockingRecommendations(budget = null) {
+    const params = new URLSearchParams()
+    if (budget !== null && budget !== undefined) params.append('budget', budget)
+    const response = await axios.get(`${API_BASE_URL}/restocking/recommendations?${params.toString()}`)
     return response.data
   },
 
