@@ -361,7 +361,8 @@ def get_restocking_recommendations(budget: float = 0):
         max_affordable = int(remaining_budget // unit_cost)
         qty = min(c["demand_gap"], max_affordable)
         if qty <= 0:
-            break
+            # skip items that can't be afforded; cheaper items later in the sorted list may still fit
+            continue
         line_total = round(qty * unit_cost, 2)
         recommendations.append({
             "sku": c["sku"],
