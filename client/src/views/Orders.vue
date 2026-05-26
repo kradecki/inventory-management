@@ -75,40 +75,43 @@
         </div>
       </div>
 
-      <div v-if="restockingOrders.length > 0" class="card restocking-card">
-        <div class="card-header">
-          <h3 class="card-title">Submitted Restocking Orders ({{ restockingOrders.length }})</h3>
-        </div>
-        <div class="table-container">
-          <table class="orders-table restocking-table">
-            <thead>
-              <tr>
-                <th class="col-order-number">Order #</th>
-                <th class="col-items">Items</th>
-                <th class="col-status">Status</th>
-                <th class="col-date">Submitted Date</th>
-                <th class="col-date">Expected Delivery</th>
-                <th class="col-lead-time">Lead Time</th>
-                <th class="col-value">Total Cost</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="order in restockingOrders" :key="order.id">
-                <td class="col-order-number"><strong>{{ order.order_number }}</strong></td>
-                <td class="col-items">{{ order.items.length }} items</td>
-                <td class="col-status">
-                  <span class="badge info">{{ order.status }}</span>
-                </td>
-                <td class="col-date">{{ formatDate(order.order_date) }}</td>
-                <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
-                <td class="col-lead-time">14 days</td>
-                <td class="col-value"><strong>{{ currencySymbol }}{{ order.total_cost.toLocaleString() }}</strong></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    </div>
+  </div>
 
+  <!-- Restocking orders rendered independently — not coupled to the main orders error state -->
+  <div v-if="restockingOrders.length > 0" class="restocking-section">
+    <div class="card restocking-card">
+      <div class="card-header">
+        <h3 class="card-title">Submitted Restocking Orders ({{ restockingOrders.length }})</h3>
+      </div>
+      <div class="table-container">
+        <table class="orders-table restocking-table">
+          <thead>
+            <tr>
+              <th class="col-order-number">{{ t('orders.table.orderNumber') }}</th>
+              <th class="col-items">{{ t('orders.table.items') }}</th>
+              <th class="col-status">{{ t('orders.table.status') }}</th>
+              <th class="col-date">{{ t('orders.table.orderDate') }}</th>
+              <th class="col-date">{{ t('orders.table.expectedDelivery') }}</th>
+              <th class="col-lead-time">Lead Time</th>
+              <th class="col-value">{{ t('orders.table.totalValue') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="order in restockingOrders" :key="order.id">
+              <td class="col-order-number"><strong>{{ order.order_number }}</strong></td>
+              <td class="col-items">{{ order.items.length }} items</td>
+              <td class="col-status">
+                <span class="badge info">{{ order.status }}</span>
+              </td>
+              <td class="col-date">{{ formatDate(order.order_date) }}</td>
+              <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
+              <td class="col-lead-time">14 days</td>
+              <td class="col-value"><strong>{{ currencySymbol }}{{ (order.total_cost ?? 0).toLocaleString() }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -122,7 +125,7 @@ import { useI18n } from '../composables/useI18n'
 export default {
   name: 'Orders',
   setup() {
-    const { t, currentCurrency, translateProductName, translateCustomerName } = useI18n()
+    const { t, currentCurrency, currentLocale, translateProductName, translateCustomerName } = useI18n()
 
     const currencySymbol = computed(() => {
       return currentCurrency.value === 'JPY' ? '¥' : '$'
@@ -180,9 +183,11 @@ export default {
     }
 
     const formatDate = (dateString) => {
-      const { currentLocale } = useI18n()
+      if (!dateString) return '-'
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return '-'
       const locale = currentLocale.value === 'ja' ? 'ja-JP' : 'en-US'
-      return new Date(dateString).toLocaleDateString(locale, {
+      return date.toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -251,8 +256,12 @@ export default {
   width: 100px;
 }
 
-.restocking-card {
+.restocking-section {
   margin-top: 1.5rem;
+}
+
+.restocking-card {
+  margin-top: 0;
 }
 
 /* Items details styling */
