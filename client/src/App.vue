@@ -131,6 +131,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+  --sidebar-full: 240px;
+  --sidebar-icon: 64px;
+}
+
 .app {
   display: flex;
   flex-direction: row;
@@ -142,19 +147,20 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  margin-left: 240px;
+  margin-left: var(--sidebar-full);
   transition: margin-left 0.2s ease;
 }
 
 @media (max-width: 1023px) and (min-width: 768px) {
   .main-column {
-    margin-left: 64px;
+    margin-left: var(--sidebar-icon);
   }
 }
 
 @media (max-width: 767px) {
   .main-column {
     margin-left: 0;
+    padding-top: 52px; /* clearance for fixed hamburger button */
   }
 }
 

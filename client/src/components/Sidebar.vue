@@ -85,7 +85,7 @@ export default {
   top: 0;
   left: 0;
   height: 100vh;
-  width: 240px;
+  width: var(--sidebar-full, 240px);
   background: #1e293b;
   border-right: 1px solid #334155;
   display: flex;
@@ -206,7 +206,7 @@ export default {
 /* 768–1023px: icons only + tooltip */
 @media (max-width: 1023px) and (min-width: 768px) {
   .sidebar {
-    width: 64px;
+    width: var(--sidebar-icon, 64px);
   }
 
   .sidebar-logo {
@@ -274,7 +274,7 @@ export default {
 /* <768px: hidden sidebar + hamburger */
 @media (max-width: 767px) {
   .sidebar {
-    width: 240px;
+    width: var(--sidebar-full, 240px);
     transform: translateX(-100%);
   }
 
