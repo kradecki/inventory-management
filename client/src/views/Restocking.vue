@@ -96,7 +96,7 @@
       <div class="actions">
         <button
           class="btn btn-primary"
-          :disabled="placingOrder || recommendations.length === 0"
+          :disabled="placingOrder || recommendations.length === 0 || totalCost > budget"
           @click="placeOrder"
         >
           {{ placingOrder ? 'Placing...' : 'Place Order' }}
@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { api } from '../api'
 
 export default {
@@ -126,6 +126,7 @@ export default {
     const successOrder = ref(null)
 
     let debounceTimer = null
+    let requestId = 0
 
     const totalCost = computed(() =>
       recommendations.value.reduce((sum, item) => sum + item.line_total, 0)
@@ -133,8 +134,10 @@ export default {
 
     const budgetRemaining = computed(() => budget.value - totalCost.value)
 
-    const formatCurrency = (value) =>
-      value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+    const formatCurrency = (value) => {
+      if (value == null || isNaN(value)) return '-'
+      return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+    }
 
     const formatDate = (dateString) => {
       const date = new Date(dateString)
@@ -151,17 +154,24 @@ export default {
         recommendations.value = []
         return
       }
+      // track request to discard stale responses when budget changes mid-flight
+      const thisRequest = ++requestId
       loading.value = true
       error.value = null
       try {
-        recommendations.value = await api.getRestockingRecommendations(budget.value)
+        const data = await api.getRestockingRecommendations(budget.value)
+        if (thisRequest !== requestId) return
+        recommendations.value = data
       } catch (err) {
+        if (thisRequest !== requestId) return
         error.value = 'Failed to load recommendations'
         console.error(err)
       } finally {
-        loading.value = false
+        if (thisRequest === requestId) loading.value = false
       }
     }
+
+    onUnmounted(() => clearTimeout(debounceTimer))
 
     watch(budget, () => {
       successOrder.value = null
