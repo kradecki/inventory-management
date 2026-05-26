@@ -49,7 +49,7 @@
     "item_sku": "PCB-002",
     "item_name": "Dual Layer PCB Assembly",
     "current_demand": 150,
-    "forecasted_demand": 153,
+    "forecasted_demand": 152,
     "trend": "stable",
     "period": "Next 30 days"
   },
@@ -58,7 +58,7 @@
     "item_sku": "TMP-201",
     "item_name": "Temperature Sensor Module",
     "current_demand": 80,
-    "forecasted_demand": 82,
+    "forecasted_demand": 81,
     "trend": "stable",
     "period": "Next 30 days"
   },
