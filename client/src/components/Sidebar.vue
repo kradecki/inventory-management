@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import LanguageSwitcher from './LanguageSwitcher.vue'
 import ProfileMenu from './ProfileMenu.vue'
@@ -64,15 +64,15 @@ export default {
     const { t } = useI18n()
     const mobileOpen = ref(false)
 
-    const navItems = [
-      { path: '/',            label: t('nav.overview'),        icon: ICONS.overview },
-      { path: '/inventory',   label: t('nav.inventory'),       icon: ICONS.inventory },
-      { path: '/orders',      label: t('nav.orders'),          icon: ICONS.orders },
-      { path: '/spending',    label: t('nav.finance'),         icon: ICONS.finance },
-      { path: '/demand',      label: t('nav.demandForecast'),  icon: ICONS.demand },
-      { path: '/reports',     label: 'Reports',                icon: ICONS.reports },
-      { path: '/restocking',  label: t('nav.restocking'),      icon: ICONS.restocking },
-    ]
+    const navItems = computed(() => [
+      { path: '/',           label: t('nav.overview'),       icon: ICONS.overview },
+      { path: '/inventory',  label: t('nav.inventory'),      icon: ICONS.inventory },
+      { path: '/orders',     label: t('nav.orders'),         icon: ICONS.orders },
+      { path: '/spending',   label: t('nav.finance'),        icon: ICONS.finance },
+      { path: '/demand',     label: t('nav.demandForecast'), icon: ICONS.demand },
+      { path: '/reports',    label: t('nav.reports'),        icon: ICONS.reports },
+      { path: '/restocking', label: t('nav.restocking'),     icon: ICONS.restocking },
+    ])
 
     return { t, mobileOpen, navItems }
   }
@@ -91,7 +91,7 @@ export default {
   display: flex;
   flex-direction: column;
   z-index: 100;
-  overflow: hidden;
+  /* overflow: hidden removed — would clip dropdown menus and tooltips */
   transition: width 0.2s ease, transform 0.2s ease;
 }
 
@@ -107,6 +107,7 @@ export default {
   border-bottom: 1px solid #334155;
   flex-shrink: 0;
   white-space: nowrap;
+  overflow: hidden; /* hide logo text during width collapse */
 }
 
 .logo-name {
@@ -130,7 +131,7 @@ export default {
   flex-direction: column;
   gap: 0.125rem;
   overflow-y: auto;
-  overflow-x: hidden;
+  /* overflow-x intentionally not set — allows tooltips to extend beyond sidebar */
 }
 
 .sidebar-item {
